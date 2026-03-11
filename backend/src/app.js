@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import { generateAccessToken } from "./utils/tokenGeneration";
 
 const app = express();
 
