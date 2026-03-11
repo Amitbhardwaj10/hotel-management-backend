@@ -27,28 +27,38 @@ const userSchema = new Schema(
 		password: {
 			type: String,
 			required: [true, "Password is required"],
-			minlength: [6, "Password must be at least 6 characters"],
+			minlength: [8, "Password must be at least 8 characters"],
 		},
 
 		phone: {
-			type: string,
+			type: String,
 			trim: true,
 			required: [true, "Phone number is required"],
 			match: [/^\d{10}$/, "Phone number must be a 10-digit number."],
 		},
 
-		IsVerified: Boolean,
+		isVerified: {
+			type: Boolean,
+			default: false,
+		},
 
 		guestId: {
 			type: String,
-			required: true,
 			trim: true,
-			match: [/^\d{12}$/, "Enter valid id!"],
+			match: [/^\d{12}$/, "Enter valid 12-digit guest ID!"],
+			required: function () {
+				return this.role === "guest";
+			},
+			unique: true,
 		},
 
 		employeeId: {
 			type: String,
-			required: true,
+			trim: true,
+			required: function () {
+				return this.role !== "guest" && this.role !== "admin";
+			},
+			unique: true,
 		},
 
 		refreshToken: {
