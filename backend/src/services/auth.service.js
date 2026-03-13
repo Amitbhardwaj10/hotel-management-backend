@@ -1,13 +1,14 @@
-import User from "../models/user.model.js";
+import { User } from "../models/user.model.js";
 import ApiError from "../utils/ApiError.js";
 import {
 	generateAccessToken,
 	generateRefreshToken,
 } from "../utils/tokenGeneration.js";
+import jwt from "jsonwebtoken";
 
 const generateAccessRefreshToken = async (userId) => {
 	try {
-		const user = await findById(userId);
+		const user = await User.findById(userId);
 
 		const accessToken = generateAccessToken(user);
 		const refreshToken = generateRefreshToken(user);
@@ -25,7 +26,7 @@ const generateAccessRefreshToken = async (userId) => {
 };
 
 const registerService = async (data) => {
-	const { email, fullname, role, password, phone, guestId, employeeId } = data;
+	const { email, fullname, password, phone, guestId } = data;
 
 	const existedUser = await User.findOne({
 		$or: [{ email }, { phone }],
@@ -38,11 +39,10 @@ const registerService = async (data) => {
 	const user = await User.create({
 		email,
 		fullname,
-		role,
+		role: "guest",
 		password,
 		phone,
 		guestId,
-		employeeId,
 	});
 
 	if (!user) {
@@ -67,11 +67,32 @@ const loginService = async (data) => {
 		throw new ApiError(401, "invalid user credentials");
 	}
 
-	const { accessToken, refreshToken } = generateAccessRefreshToken(user._id);
+	const { accessToken, refreshToken } = await generateAccessRefreshToken(
+		user._id,
+	);
 
 	const loggedInUser = await User.findById(user._id);
 
 	return { loggedInUser, accessToken, refreshToken };
 };
 
-export { registerService, loginService };
+const refreshAccessTokenService = async (oldRefreshToken) => {
+	const decodedToken = jwt.verify(
+		oldRefreshToken,
+		process.env.REFRESH_TOKEN_SECRET,
+	);
+
+	const user = await User.findById(decodedToken?._id);
+
+	if (!user) {
+		throw new ApiError(401, "Invalid refresh token");
+	}
+
+	if (oldRefreshToken !== user.refreshToken) {
+		throw new ApiError(401, "Invalid refresh token");
+	}
+
+	return generateAccessRefreshToken(user._id);
+};
+
+export { registerService, loginService, refreshAccessTokenService };

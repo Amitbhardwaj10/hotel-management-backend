@@ -4,8 +4,9 @@ export const validate = (schema) => (req, _, next) => {
 	const result = schema.safeParse(req.body);
 
 	if (!result.success) {
-		const error = new ApiError(400, "Validation failed", result.error.issues);
-		return next(error);
+		const message = result.error.issues[0].message;
+
+		return next(new ApiError(400, message));
 	}
 
 	req.body = result.data;

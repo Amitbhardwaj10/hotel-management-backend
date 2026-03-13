@@ -46,18 +46,7 @@ const userSchema = new Schema(
 			type: String,
 			trim: true,
 			match: [/^\d{12}$/, "Enter valid 12-digit guest ID!"],
-			required: function () {
-				return this.role === "guest";
-			},
-			unique: true,
-		},
-
-		employeeId: {
-			type: String,
-			trim: true,
-			required: function () {
-				return this.role !== "guest" && this.role !== "admin";
-			},
+			required: true,
 			unique: true,
 		},
 
@@ -72,6 +61,7 @@ userSchema.set("toJSON", {
 	transform: function (_, ret) {
 		delete ret.password;
 		delete ret.refreshToken;
+		delete ret.role;
 		return ret;
 	},
 });

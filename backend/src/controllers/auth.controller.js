@@ -1,6 +1,11 @@
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiResponse from "../utils/ApiResponse.js";
-import { registerService } from "../services/auth.service.js";
+import {
+	loginService,
+	refreshAccessTokenService,
+	registerService,
+} from "../services/auth.service.js";
+import ApiError from "../utils/ApiError.js";
 
 const register = asyncHandler(async (req, res) => {
 	const user = await registerService(req.body);
@@ -46,4 +51,36 @@ const login = asyncHandler(async (req, res) => {
 		);
 });
 
-export { register, login };
+const refreshAccessToken = asyncHandler(async (req, res) => {
+	const incomingRefreshToken =
+		req.cookies.refreshToken || req.body.refreshToken;
+
+	if (!incomingRefreshToken) {
+		throw new ApiError(401, "unauthorized request");
+	}
+	const { accessToken, refreshToken } =
+		await refreshAccessTokenService(incomingRefreshToken);
+
+	const accessOptions = {
+		httpOnly: true,
+		secure: true,
+		sameSite: "strict",
+		maxAge: 15 * 60 * 1000,
+	};
+
+	const refreshOptions = { ...accessOptions, maxAge: 30 * 24 * 60 * 60 * 1000 };
+
+	return res
+		.status(200)
+		.cookie("accessToken", accessToken, accessOptions)
+		.cookie("refreshToken", refreshToken, refreshOptions)
+		.json(
+			new ApiResponse(
+				200,
+				{ accessToken, refreshToken },
+				"access token refreshed",
+			),
+		);
+});
+
+export { register, login, refreshAccessToken };
