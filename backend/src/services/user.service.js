@@ -1,4 +1,4 @@
-import { User } from "../models/user.model.js";
+import { User } from "../models/guest.model.js";
 
 const logoutService = async (userId) => {
 	await User.findByIdAndUpdate(

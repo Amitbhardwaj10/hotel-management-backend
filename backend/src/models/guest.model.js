@@ -50,6 +50,8 @@ const userSchema = new Schema(
 			unique: true,
 		},
 
+		bookingHistory: [{ type: mongoose.Schema.Types.ObjectId, ref: "Booking" }],
+
 		refreshToken: {
 			type: String,
 		},
