@@ -45,9 +45,19 @@ const userSchema = new Schema(
 		guestId: {
 			type: String,
 			trim: true,
-			match: [/^\d{12}$/, "Enter valid 12-digit guest ID!"],
-			required: true,
 			unique: true,
+			required: function () {
+				return this.role === "guest";
+			},
+		},
+
+		employeeId: {
+			type: String,
+			trim: true,
+			unique: true,
+			required: function () {
+				return this.role === "staff" || this.role === "manager";
+			},
 		},
 
 		bookingHistory: [{ type: mongoose.Schema.Types.ObjectId, ref: "Booking" }],

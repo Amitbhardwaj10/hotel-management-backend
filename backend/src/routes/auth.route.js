@@ -5,7 +5,7 @@ import {
 	register,
 } from "../controllers/auth.controller.js";
 import {
-	registerUserSchema,
+	registerGuestSchema,
 	loginUserSchema,
 } from "../validators/user.validate.js";
 import { validate } from "../middlewares/validate.middleware.js";
@@ -13,7 +13,7 @@ import { validate } from "../middlewares/validate.middleware.js";
 const router = Router();
 
 // public routes
-router.route("/register").post(validate(registerUserSchema), register);
+router.route("/register").post(validate(registerGuestSchema), register);
 router.route("/login").post(validate(loginUserSchema), login);
 router.route("/refresh").post(refreshAccessToken);
 
