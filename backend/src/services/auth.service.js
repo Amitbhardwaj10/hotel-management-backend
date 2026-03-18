@@ -61,7 +61,7 @@ const loginService = async (data) => {
 		throw new ApiError(404, "user does not exist");
 	}
 
-	const isPasswordValid = user.isPasswordCorrect(password);
+	const isPasswordValid = await user.isPasswordCorrect(password);
 
 	if (!isPasswordValid) {
 		throw new ApiError(401, "invalid user credentials");

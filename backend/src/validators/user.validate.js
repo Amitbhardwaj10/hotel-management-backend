@@ -34,4 +34,16 @@ const loginUserSchema = z
 	})
 	.strict();
 
-export { registerGuestSchema, loginUserSchema, createEmployeeSchema };
+const passwordSchema = z
+	.object({
+		currentPassword: z.string().min(1, "Current Password is required"),
+		newPassword: z.string().min(8, "Password must be at least 8 characters"),
+	})
+	.strict();
+
+export {
+	registerGuestSchema,
+	loginUserSchema,
+	createEmployeeSchema,
+	passwordSchema,
+};
