@@ -19,9 +19,12 @@ app.use(cookieParser());
 // routes import
 import authRouter from "../src/routes/auth.route.js";
 import userRouter from "../src/routes/user.route.js";
+import roomRouter from "../src/routes/room.route.js";
+import { User } from "./models/user.model.js";
 
 // routes declaration
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/rooms", roomRouter);
 
 export default app;
