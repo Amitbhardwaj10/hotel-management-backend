@@ -1,7 +1,10 @@
+import { ja } from "zod/v4/locales";
 import {
 	addNewRoomService,
+	deleteRoomService,
 	getAllRoomsService,
 	getSingleRoomService,
+	updateRoomService,
 } from "../services/room.service.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
@@ -35,4 +38,51 @@ const getSingleRoom = asyncHandler(async (req, res) => {
 		.json(new ApiResponse(200, room, "got the single room successfully"));
 });
 
-export { addNewRoom, getAllRooms, getSingleRoom };
+const updateRoom = asyncHandler(async (req, res) => {
+	const roomId = req.params?.roomId;
+
+	if (!roomId && !mongoose.Types.ObjectId.isValid(roomId)) {
+		throw new ApiError(400, "invalid room id");
+	}
+	const updatedRoom = await updateRoomService(roomId, req.body);
+
+	return res
+		.status(200)
+		.json(new ApiResponse(200, updatedRoom, "room updated successfully"));
+});
+
+const updateStatus = asyncHandler(async (req, res) => {
+	const roomId = req.params?.roomId;
+
+	if (!roomId && !mongoose.Types.ObjectId.isValid(roomId)) {
+		throw new ApiError(400, "invalid room id");
+	}
+
+	const room = updateRoomService(roomId, req.body);
+	res
+		.status(200)
+		.json(new ApiResponse(200, room, "room status updated successfully"));
+});
+
+const deleteARoom = asyncHandler(async (req, res) => {
+	const roomId = req.params?.roomId;
+
+	if (!roomId || !mongoose.Types.ObjectId.isValid(roomId)) {
+		throw new ApiError(400, "invalid room id");
+	}
+
+	const deletedRoom = await deleteRoomService(roomId);
+
+	return res
+		.status(200)
+		.json(new ApiResponse(200, deletedRoom, "room deleted successfully!"));
+});
+
+export {
+	addNewRoom,
+	getAllRooms,
+	getSingleRoom,
+	updateRoom,
+	updateStatus,
+	deleteARoom,
+};

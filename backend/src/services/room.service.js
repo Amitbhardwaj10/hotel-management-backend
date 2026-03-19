@@ -45,4 +45,37 @@ const getSingleRoomService = async (roomId) => {
 	return room;
 };
 
-export { addNewRoomService, getAllRoomsService, getSingleRoomService };
+const updateRoomService = async (roomId, data) => {
+	const updatedRoom = Room.findByIdAndUpdate(
+		roomId,
+		{
+			$set: data,
+		},
+
+		{ returnDocument: "after" },
+	);
+
+	if (!updatedRoom) {
+		throw new ApiError(500, "error while updating the room");
+	}
+
+	return updatedRoom;
+};
+
+const deleteRoomService = async (roomId) => {
+	const deletedRoom = await Room.findByIdAndDelete(roomId);
+
+	if (!deletedRoom) {
+		throw new ApiError(404, "room not found");
+	}
+
+	return deletedRoom;
+};
+
+export {
+	addNewRoomService,
+	getAllRoomsService,
+	getSingleRoomService,
+	updateRoomService,
+	deleteRoomService,
+};

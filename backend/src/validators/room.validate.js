@@ -20,4 +20,19 @@ const addRoomSchema = z.object({
 	amenities: z.array(z.enum(amenitiesEnum)).default([]),
 });
 
-export { addRoomSchema };
+const updateRoomSchema = z
+	.object({
+		roomType: z.enum(roomTypeEnum).optional(),
+		price: z.number().min(0).optional(),
+		status: z.enum(statusEnum).optional(),
+		amenities: z.array(z.enum(amenitiesEnum)).optional(),
+	})
+	.refine((data) => Object.keys(data).length > 0, {
+		message: "at least one field must be provided to update",
+	});
+
+const updateRoomStatusSchema = z.object({
+	status: z.enum(["available", "occupied", "maintenance"]),
+});
+
+export { addRoomSchema, updateRoomSchema, updateRoomStatusSchema };
