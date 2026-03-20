@@ -1,15 +1,14 @@
 import mongoose, { Schema } from "mongoose";
-import { refreshAccessTokenService } from "../services/auth.service";
 
 const bookingSchema = new Schema(
 	{
-		guest: {
+		guestId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "User",
 			required: [true, "A booking must belong to a guest"],
 		},
 
-		room: {
+		roomId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "Room",
 			required: [true, "A booking must have a room assigned"],
@@ -39,12 +38,5 @@ const bookingSchema = new Schema(
 	},
 	{ timestamps: true },
 );
-
-bookingSchema.pre("save", function () {
-	if (this.checkInDate >= this.checkOutDate) {
-		return next(new Error("Chcek-out date must be after check-in date"));
-	}
-	next();
-});
 
 export const Booking = mongoose.model("Booking", bookingSchema);
