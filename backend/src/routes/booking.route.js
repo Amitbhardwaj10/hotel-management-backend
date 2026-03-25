@@ -4,6 +4,7 @@ import { validate } from "../middlewares/validate.middleware.js";
 import { createBookingSchema } from "../validators/booking.validate.js";
 import { authorizeRoles } from "../middlewares/role.middleware.js";
 import {
+	cancelBooking,
 	checkIn,
 	checkOut,
 	createBooking,
@@ -33,4 +34,7 @@ router
 	.route("/booking/check-out/:bookingId")
 	.patch(authorizeRoles("staff", "manager", "admin"), checkOut);
 
+router
+	.route("/booking/cancel-booking/:bookingId")
+	.patch(authorizeRoles("guest", "staff", "manager", "admin"), cancelBooking);
 export default router;

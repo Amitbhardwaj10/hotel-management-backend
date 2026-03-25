@@ -3,6 +3,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import mongoose from "mongoose";
 import ApiError from "../utils/ApiError.js";
 import {
+	cancelBookingService,
 	checkInService,
 	checkOutService,
 	createBookingService,
@@ -70,7 +71,6 @@ const checkIn = asyncHandler(async (req, res) => {
 
 const checkOut = asyncHandler(async (req, res) => {
 	const bookingId = req.params?.bookingId;
-
 	if (!bookingId || !mongoose.Types.ObjectId.isValid(bookingId)) {
 		throw new ApiError(400, "invalid booking id");
 	}
@@ -82,4 +82,31 @@ const checkOut = asyncHandler(async (req, res) => {
 		.json(new ApiResponse(200, booking, "successfully checked-out"));
 });
 
-export { createBooking, getAllBookings, getMyBookings, checkIn, checkOut };
+const cancelBooking = asyncHandler(async (req, res) => {
+	const bookingId = req.params?.bookingId;
+
+	if (!bookingId || !mongoose.Types.ObjectId.isValid(bookingId)) {
+		throw new ApiError(400, "invalid booking id");
+	}
+
+	const booking = await cancelBookingService(req.user, bookingId);
+
+	return res
+		.status(200)
+		.json(
+			new ApiResponse(
+				200,
+				booking,
+				"your booking has been cancelled successfully",
+			),
+		);
+});
+
+export {
+	createBooking,
+	getAllBookings,
+	getMyBookings,
+	checkIn,
+	checkOut,
+	cancelBooking,
+};

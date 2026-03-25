@@ -85,18 +85,75 @@ const checkInService = async (bookingId) => {
 
 const checkOutService = async (bookingId) => {
 	const booking = await Booking.findById(bookingId);
-
 	if (!booking) throw new ApiError(404, "booking not found");
 
 	if (booking.status !== "checkedin") {
 		throw new ApiError(400, "guest must be checked-in before check-out");
 	}
 
-	//put into booking history too.
-	User.bookingHistory.push(bookingId);
+	const user = await User.findById(booking.guestId);
+	if (!user) throw new ApiError(404, "user not found");
 
-	booking.status = "checkedout";
-	await booking.save({ validateBeforeSave: false });
+	const session = await mongoose.startSession();
+	session.startTransaction();
+
+	try {
+		booking.status = "checkedout";
+		await booking.save({ session, validateBeforeSave: false });
+
+		user.bookingHistory.push(bookingId);
+		await user.save({ session, validateBeforeSave: false });
+
+		await session.commitTransaction();
+	} catch (error) {
+		await session.abortTransaction();
+		throw new ApiError(500, "checkout failed");
+	} finally {
+		session.endSession();
+	}
+
+	return booking;
+};
+
+const cancelBookingService = async (reqUser, bookingId) => {
+	const booking = await Booking.findById(bookingId);
+	if (!booking) throw new ApiError(404, "booking not found");
+
+	if (booking.status === "cancelled") {
+		throw new ApiError(400, "booking is already cancelled");
+	}
+
+	if (booking.status === "checkedout") {
+		throw new ApiError(400, "cannot cancel a completed booking");
+	}
+
+	if (
+		booking.guestId.toString() !== reqUser._id.toString() &&
+		reqUser.role === "guest"
+	) {
+		throw new ApiError(403, "you can only cancel your own booking");
+	}
+
+	const user = await User.findById(booking.guestId);
+	if (!user) throw new ApiError(404, "user not found");
+
+	const session = await mongoose.startSession();
+	session.startTransaction();
+
+	try {
+		booking.status = "cancelled";
+		await booking.save({ session, validateBeforeSave: false });
+
+		user.bookingHistory.push(bookingId);
+		await user.save({ session, validateBeforeSave: false });
+
+		await session.commitTransaction();
+	} catch (error) {
+		await session.abortTransaction();
+		throw new ApiError(500, "error while cancelling booking");
+	} finally {
+		session.endSession();
+	}
 
 	return booking;
 };
@@ -107,4 +164,5 @@ export {
 	getMyBookingsService,
 	checkInService,
 	checkOutService,
+	cancelBookingService,
 };
