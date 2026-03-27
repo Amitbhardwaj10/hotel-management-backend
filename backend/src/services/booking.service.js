@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Booking } from "../models/booking.model.js";
 import { Room } from "../models/room.model.js";
 import { User } from "../models/user.model.js";
