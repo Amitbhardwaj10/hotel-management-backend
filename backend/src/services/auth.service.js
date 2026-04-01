@@ -26,7 +26,7 @@ const generateAccessRefreshToken = async (userId) => {
 };
 
 const registerService = async (data) => {
-	const { email, fullname, password, phone, guestId } = data;
+	const { email, fullname, password, phone, guestId, role } = data;
 
 	const existedUser = await User.findOne({
 		$or: [{ email }, { phone }],
@@ -39,7 +39,7 @@ const registerService = async (data) => {
 	const user = await User.create({
 		email,
 		fullname,
-		role: "guest",
+		role: role || "guest",
 		password,
 		phone,
 		guestId,
