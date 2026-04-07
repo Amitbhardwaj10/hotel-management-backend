@@ -25,6 +25,25 @@ const addNewRoomService = async (data) => {
 	return addedRoom;
 };
 
+const addBulkRoomsService = async (rooms) => {
+	try {
+		const addedRooms = await Room.insertMany(rooms, { ordered: false });
+		return addedRooms;
+	} catch (error) {
+		if (error.name === "MongoBulkWriteError") {
+			const insertedRooms = error.insertedDocs;
+
+			if (insertedRooms.length > 0) {
+				return insertedRooms;
+			}
+
+			throw new ApiError(400, "all rooms already exist");
+		}
+
+		throw new ApiError(500, "error while adding rooms in bulk");
+	}
+};
+
 const getAllRoomsService = async () => {
 	const rooms = await Room.find();
 
@@ -78,4 +97,5 @@ export {
 	getSingleRoomService,
 	updateRoomService,
 	deleteRoomService,
+	addBulkRoomsService,
 };

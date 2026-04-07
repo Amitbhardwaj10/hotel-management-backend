@@ -1,12 +1,14 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import {
+	addRoomsBulkSchema,
 	addRoomSchema,
 	updateRoomSchema,
 	updateRoomStatusSchema,
 } from "../validators/room.validate.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import {
+	addBulkRooms,
 	addNewRoom,
 	deleteARoom,
 	getAllRooms,
@@ -31,6 +33,14 @@ router
 		authorizeRoles("admin", "manager"),
 		validate(addRoomSchema),
 		addNewRoom,
+	);
+
+router
+	.route("/room/add-bulk")
+	.post(
+		authorizeRoles("admin", "manager"),
+		validate(addRoomsBulkSchema),
+		addBulkRooms,
 	);
 
 router

@@ -20,6 +20,8 @@ const addRoomSchema = z.object({
 	amenities: z.array(z.enum(amenitiesEnum)).default([]),
 });
 
+const addRoomsBulkSchema = z.array(addRoomSchema).min(1).max(10);
+
 const updateRoomSchema = z
 	.object({
 		roomType: z.enum(roomTypeEnum).optional(),
@@ -35,4 +37,9 @@ const updateRoomStatusSchema = z.object({
 	status: z.enum(["available", "occupied", "maintenance"]),
 });
 
-export { addRoomSchema, updateRoomSchema, updateRoomStatusSchema };
+export {
+	addRoomSchema,
+	updateRoomSchema,
+	updateRoomStatusSchema,
+	addRoomsBulkSchema,
+};

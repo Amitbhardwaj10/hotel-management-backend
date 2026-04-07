@@ -1,5 +1,6 @@
 import { ja } from "zod/v4/locales";
 import {
+	addBulkRoomsService,
 	addNewRoomService,
 	deleteRoomService,
 	getAllRoomsService,
@@ -17,6 +18,14 @@ const addNewRoom = asyncHandler(async (req, res) => {
 	return res
 		.status(201)
 		.json(new ApiResponse(201, addedRoom, "room added successfully"));
+});
+
+const addBulkRooms = asyncHandler(async (req, res) => {
+	const addedRooms = await addBulkRoomsService(req.body);
+
+	return res
+		.status(201)
+		.json(new ApiResponse(201, addedRooms, "rooms added successfuly"));
 });
 
 const getAllRooms = asyncHandler(async (req, res) => {
@@ -80,6 +89,7 @@ const deleteARoom = asyncHandler(async (req, res) => {
 
 export {
 	addNewRoom,
+	addBulkRooms,
 	getAllRooms,
 	getSingleRoom,
 	updateRoom,
